@@ -20,6 +20,6 @@ When a date is clicked, a popup with a **bar graph** shows the related data.
 ## 📂 Project Setup
 ```bash
 git clone <your-repo-url>
-cd react-big-calendar-bar-graph
+cd big-calendar
 npm install
 npm run dev
