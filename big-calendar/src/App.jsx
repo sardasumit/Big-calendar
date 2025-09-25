@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import CalendarView from "./components/CalendarView";
+import Modal from "./components/Modal";
+import BarGraph from "./components/BarGraph";
+import { generateCalendarEvents } from "./utils/transform";
+import { eventsByDate } from "./data/events";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const events = generateCalendarEvents();
+
+  
+  const handleSelectEvent = (event) => {
+  const dateKey = event.dateKey;
+  const rawData = eventsByDate[dateKey] || [];
+
+ 
+  const data = rawData.map(item => {
+    const key = Object.keys(item)[0];
+    return { user: key, value: item[key] };
+  });
+
+  setSelectedData(data);
+  setSelectedDate(dateKey);
+  setIsModalOpen(true);
+};
+
+
+  
+  const handleSelectSlot = ({ start }) => {
+    const dateKey = start.toLocaleDateString("en-GB").split("/").join("-"); 
+    
+
+    const data = eventsByDate[dateKey] || [];
+
+    console.log("Slot Click →", dateKey, data);
+
+    setSelectedData(data);
+    setSelectedDate(dateKey);
+    setIsModalOpen(true);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen p-4 bg-gray-100">
+      <h1 className="text-2xl font-bold text-center mb-4 text-indigo-600">
+        React Big Calendar with Bar Graph
+      </h1>
+      <CalendarView
+        events={events}
+        onSelectEvent={handleSelectEvent}
+        onSelectSlot={handleSelectSlot} 
+      />
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h2 className="text-xl font-semibold mb-2">
+          Data for {selectedDate}
+        </h2>
+        <BarGraph data={selectedData} />
+      </Modal>
+    </div>
+  );
 }
-
-export default App
